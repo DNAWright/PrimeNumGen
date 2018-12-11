@@ -1,4 +1,5 @@
-// Not seeing a noticeable time increase. Time display when calculating prime numbers isn't displaying correctly.
+// Not seeing a noticeable time increase. Using semaphore for locks, and synchronized list. should be spawning 4 threads
+// with specific indices to calculate.
 // Original time for 250,000 - 6.352
 // Original time for 500, 000 - 23.565
 
@@ -9,8 +10,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.Semaphore;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -28,7 +27,7 @@ public class PrimeNumGen extends JFrame
     private volatile boolean cancel = false;
     private final PrimeNumGen thisFrame;
     private static List<Integer> primeList = Collections.synchronizedList(new ArrayList<>());
-    private int numberOfThreads = Runtime.getRuntime().availableProcessors();
+    private static int numberOfThreads = Runtime.getRuntime().availableProcessors();
 
 
 
@@ -40,7 +39,7 @@ public class PrimeNumGen extends JFrame
         png.addActionListeners();
         png.setVisible(true);
 
-        System.out.println("Total Processors: " + Runtime.getRuntime().availableProcessors() );
+        System.out.println("Total Processors: " + numberOfThreads);
 
     }
 
