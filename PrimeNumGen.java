@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.Semaphore;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.swing.JButton;
@@ -26,7 +27,6 @@ public class PrimeNumGen extends JFrame
     private final JButton cancelButton = new JButton("Cancel");
     private volatile boolean cancel = false;
     private final PrimeNumGen thisFrame;
-    private AtomicInteger totalPrimeNumbers = new AtomicInteger(0);
     private static List<Integer> primeList = Collections.synchronizedList(new ArrayList<>());
     private int numberOfThreads = Runtime.getRuntime().availableProcessors();
 
@@ -142,7 +142,6 @@ public class PrimeNumGen extends JFrame
                 if(isPrime(i))
                 {
                     primeList.add(i);
-                    totalPrimeNumbers.getAndIncrement();
                 }
             }
             sem.release();
@@ -170,7 +169,7 @@ public class PrimeNumGen extends JFrame
                     if (System.currentTimeMillis() - lastUpdate > 500)
                     {
                         final String outString = "Found " + primeList.size() + "of " + max + " in "
-                                + ((System.currentTimeMillis() - lastUpdate) / 1000) + " seconds ";
+                                + ((System.currentTimeMillis() - startTime )/1000f) + " seconds ";
 
                         SwingUtilities.invokeLater(new Runnable()
                         {
@@ -181,7 +180,6 @@ public class PrimeNumGen extends JFrame
                             }
                         });
 
-                        aTextField.setText(outString);
                         lastUpdate = System.currentTimeMillis();
                     }
                 }
