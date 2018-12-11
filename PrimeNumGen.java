@@ -24,8 +24,7 @@ public class PrimeNumGen extends JFrame
     private final PrimeNumGen thisFrame;
     private AtomicInteger totalPrimeNumbers = new AtomicInteger(0);
     private static List<Integer> primeList = Collections.synchronizedList(new ArrayList<>());
-    private volatile long lastUpdate = System.currentTimeMillis();
-    private int numberOfThreads = Runtime.getRuntime().availableProcessors() - 1;
+    private int numberOfThreads = Runtime.getRuntime().availableProcessors();
 
 
 
@@ -108,6 +107,7 @@ public class PrimeNumGen extends JFrame
         return true;
     }
 
+    // Prime threads that will run through a given number to find all primes within it's bounds
     private class primeThread implements Runnable
     {
         private int start;
@@ -149,7 +149,7 @@ public class PrimeNumGen extends JFrame
     {
         private int max;
         private Semaphore sem;
-        private float startTime = System.currentTimeMillis();
+        private long startTime = System.currentTimeMillis();
 
         private primeUpdate(int max, Semaphore sem)
         {
@@ -159,12 +159,14 @@ public class PrimeNumGen extends JFrame
 
         public void run()
         {
-                while(sem.availablePermits() != numberOfThreads)
+            //Shows how many prime numbers have been found in X amount of time
+            long lastUpdate = System.currentTimeMillis();
+            while(sem.availablePermits() != numberOfThreads)
                 {
                     if (System.currentTimeMillis() - lastUpdate > 500)
                     {
-                        final String outString = "Found " + primeList.size() + "of " + max + " "
-                                + (System.currentTimeMillis() - lastUpdate / 1000) + " seconds ";
+                        final String outString = "Found " + primeList.size() + "of " + max + " in "
+                                + ((System.currentTimeMillis() - lastUpdate) / 1000L) + " seconds ";
 
                         SwingUtilities.invokeLater(new Runnable()
                         {
@@ -175,10 +177,11 @@ public class PrimeNumGen extends JFrame
                             }
                         });
 
+                        aTextField.setText(outString);
                         lastUpdate = System.currentTimeMillis();
                     }
                 }
-                // Working on this section. Writes final list or cancel to the screen
+                //Display prime list and the total time it took.
                 final StringBuffer buff = new StringBuffer();
 
                 for( Integer i2 : primeList)
@@ -207,6 +210,7 @@ public class PrimeNumGen extends JFrame
             }
         }
 
+    // Gets user input for max number and starts off the threads based on partitions
     private class UserInput implements Runnable
     {
         private final int max;
@@ -220,12 +224,19 @@ public class PrimeNumGen extends JFrame
         {
             cancel = false;
             Semaphore sem = new Semaphore(numberOfThreads);
-
-
-            for(int i=0; i < numberOfThreads; i++)
+            List<Integer> lowerBounds = new ArrayList<>();
+            lowerBounds.add(0);
+            lowerBounds.add(1);
+            for(int j =numberOfThreads; j > 0; j--)
             {
-                Thread te = new Thread(new primeThread((max* (i/numberOfThreads)), (max/numberOfThreads)*i, sem));
+                lowerBounds.add(max/j);
+            }
+            for(int i=1; i <= numberOfThreads; i++)
+            {
+                Thread te = new Thread(new primeThread(lowerBounds.get(i), (max/numberOfThreads)*i, sem));
                 te.start();
+
+                // System.out.println("Start: " + (lowerBounds.get(i)) + " Stop: " + (max/numberOfThreads)*i);
             }
 
             Thread t = new Thread(new primeUpdate(max, sem));
