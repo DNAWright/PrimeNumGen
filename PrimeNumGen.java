@@ -1,3 +1,7 @@
+// Not seeing a noticeable time increase. Time display when calculating prime numbers isn't displaying correctly.
+// Original time for 250,000 - 6.352
+// Original time for 500, 000 - 23.565
+
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -36,7 +40,7 @@ public class PrimeNumGen extends JFrame
         png.addActionListeners();
         png.setVisible(true);
 
-        System.out.println(Runtime.getRuntime().availableProcessors() );
+        System.out.println("Total Processors: " + Runtime.getRuntime().availableProcessors() );
 
     }
 
@@ -166,7 +170,7 @@ public class PrimeNumGen extends JFrame
                     if (System.currentTimeMillis() - lastUpdate > 500)
                     {
                         final String outString = "Found " + primeList.size() + "of " + max + " in "
-                                + ((System.currentTimeMillis() - lastUpdate) / 1000L) + " seconds ";
+                                + ((System.currentTimeMillis() - lastUpdate) / 1000) + " seconds ";
 
                         SwingUtilities.invokeLater(new Runnable()
                         {
@@ -236,7 +240,7 @@ public class PrimeNumGen extends JFrame
                 Thread te = new Thread(new primeThread(lowerBounds.get(i), (max/numberOfThreads)*i, sem));
                 te.start();
 
-                // System.out.println("Start: " + (lowerBounds.get(i)) + " Stop: " + (max/numberOfThreads)*i);
+                System.out.println("Start: " + (lowerBounds.get(i)) + " Stop: " + (max/numberOfThreads)*i);
             }
 
             Thread t = new Thread(new primeUpdate(max, sem));
